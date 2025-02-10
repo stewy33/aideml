@@ -175,6 +175,7 @@ def load_task_desc(cfg: Config):
 
 
 def prep_agent_workspace(cfg: Config):
+    return
     """Setup the agent's workspace and preprocess data if necessary."""
     (cfg.workspace_dir / "input").mkdir(parents=True, exist_ok=True)
     (cfg.workspace_dir / "working").mkdir(parents=True, exist_ok=True)

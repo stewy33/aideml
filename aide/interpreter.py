@@ -95,6 +95,7 @@ class Interpreter:
         timeout: int = 3600,
         format_tb_ipython: bool = False,
         agent_file_name: str = "runfile.py",
+        sandbox=None,
     ):
         """
         Simulates a standalone Python REPL with an execution time limit.

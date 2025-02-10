@@ -51,9 +51,11 @@ def _walk(path: Path):
     """Recursively walk a directory (analogous to os.walk but for pathlib.Path)"""
     for p in sorted(Path(path).iterdir()):
         if p.is_dir():
-            yield from _walk(p)
+            if not p.name.startswith('.'):  # Skip directories starting with .
+                yield from _walk(p)
             continue
-        yield p
+        if not p.name.startswith('..'):
+            yield p
 
 
 def preview_csv(p: Path, file_name: str, simple=True) -> str:
@@ -130,17 +132,20 @@ def generate(base_path, include_file_details=True, simple=False):
         for fn in _walk(base_path):
             file_name = str(fn.relative_to(base_path))
 
-            if fn.suffix == ".csv":
-                out.append(preview_csv(fn, file_name, simple=simple))
-            elif fn.suffix == ".json":
-                out.append(preview_json(fn, file_name))
-            elif fn.suffix in plaintext_files:
-                if get_file_len_size(fn)[0] < 30:
-                    with open(fn) as f:
-                        content = f.read()
-                        if fn.suffix in code_files:
-                            content = f"```\n{content}\n```"
-                        out.append(f"-> {file_name} has content:\n\n{content}")
+            try:
+                if fn.suffix == ".csv":
+                    out.append(preview_csv(fn, file_name, simple=simple))
+                elif fn.suffix == ".json":
+                    out.append(preview_json(fn, file_name))
+                elif fn.suffix in plaintext_files:
+                    if get_file_len_size(fn)[0] < 30:
+                        with open(fn) as f:
+                            content = f.read()
+                            if fn.suffix in code_files:
+                                content = f"```\n{content}\n```"
+                            out.append(f"-> {file_name} has content:\n\n{content}")
+            except Exception as e:
+                pass
 
     result = "\n\n".join(out)
 
